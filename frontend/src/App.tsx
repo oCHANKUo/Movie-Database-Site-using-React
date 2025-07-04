@@ -1,5 +1,5 @@
 import Home from "./pages/Home";
-import "./App.css";
+import "./css/App.css";
 import { Route } from "react-router-dom";
 import { Routes } from "react-router-dom";
 import Favorites from "./pages/Favorites";
