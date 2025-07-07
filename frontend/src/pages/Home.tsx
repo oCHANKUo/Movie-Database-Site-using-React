@@ -1,15 +1,40 @@
 import MovieCard from "../components/MovieCard";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { searchMovies, getPopularMovies } from "../services/api";
 import "../css/Home.css";
+
+interface Movie {
+  id: number;
+  title: string;
+  url: string | null;
+  release_date: string;
+}
 
 function Home() {
   const [searchQuery, setSearchQuery] = useState("");
 
-  const movies = [
-    { id: 1, title: "John Wick", release_date: "2020", url: "" },
-    { id: 2, title: "Terminator", release_date: "2022", url: "" },
-    { id: 3, title: "Jurrassic Park", release_date: "2022", url: "" },
-  ];
+  //const [movies, setMovies] = useState([]);
+
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  useEffect(() => {
+    const loadPopularMovies = async () => {
+      try {
+        const popularMovies = await getPopularMovies();
+        setMovies(popularMovies);
+      } catch (err) {
+        console.error(err);
+      } finally {
+      }
+    };
+    loadPopularMovies();
+  }, []);
+
+  //const movies = [
+  //  { id: 1, title: "John Wick", release_date: "2020", url: "" },
+  //  { id: 2, title: "Terminator", release_date: "2022", url: "" },
+  //  { id: 3, title: "Jurrassic Park", release_date: "2022", url: "" },
+  //];
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
