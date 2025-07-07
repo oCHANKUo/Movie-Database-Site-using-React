@@ -6,7 +6,7 @@ import "../css/Home.css";
 interface Movie {
   id: number;
   title: string;
-  url: string | null;
+  poster_path: string | null;
   release_date: string;
 }
 
@@ -16,6 +16,8 @@ function Home() {
   //const [movies, setMovies] = useState([]);
 
   const [movies, setMovies] = useState<Movie[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadPopularMovies = async () => {
@@ -23,8 +25,10 @@ function Home() {
         const popularMovies = await getPopularMovies();
         setMovies(popularMovies);
       } catch (err) {
+        setError("failed to load movies...");
         console.error(err);
       } finally {
+        setLoading(false);
       }
     };
     loadPopularMovies();
@@ -36,9 +40,22 @@ function Home() {
   //  { id: 3, title: "Jurrassic Park", release_date: "2022", url: "" },
   //];
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSearch = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    alert(searchQuery);
+    if (!searchQuery.trim()) return;
+    if (loading) return;
+
+    setLoading(true);
+    try {
+      const searchResults = await searchMovies(searchQuery);
+      setMovies(searchResults);
+      setError(null);
+    } catch (err) {
+      console.log(err);
+      setError("Failed to search movies...");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -56,16 +73,23 @@ function Home() {
         </button>
       </form>
 
-      <div className="movies-grid">
-        {movies.map((movie) => (
-          <MovieCard
-            title={movie.title}
-            release_date={movie.release_date}
-            url={movie.url}
-            key={movie.id}
-          />
-        ))}
-      </div>
+      {error && <div className="error-message">{error}</div>}
+
+      {loading ? (
+        <div className="loading">Loading...</div>
+      ) : (
+        <div className="movies-grid">
+          {movies.map((movie) => (
+            <MovieCard
+              title={movie.title}
+              release_date={movie.release_date}
+              //url={movie.url}
+              poster_path={movie.poster_path}
+              key={movie.id}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
