@@ -81,6 +81,7 @@ function Home() {
         <div className="movies-grid">
           {movies.map((movie) => (
             <MovieCard
+              id={movie.id}
               title={movie.title}
               release_date={movie.release_date}
               //url={movie.url}
